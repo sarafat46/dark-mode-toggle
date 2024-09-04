@@ -1,8 +1,6 @@
 /**
  * Dark Mode Toggle 1.0.1 (Modified for Default Dark Mode)
- * Copyright 2023 Timothy Ricks
- * Released under the MIT License
- * Released on: November 28, 2023
+ * This version forces dark mode by default and handles toggling with aria-pressed attribute.
  */
 
 function colorModeToggle() {
@@ -19,7 +17,7 @@ function colorModeToggle() {
   const htmlElement = document.documentElement;
   const computed = getComputedStyle(htmlElement);
   let toggleEl;
-  let togglePressed = "false";
+  let togglePressed = "false";  // Default aria-pressed to false
 
   const scriptTag = document.querySelector("[tr-color-vars]");
   if (!scriptTag) {
@@ -53,7 +51,7 @@ function colorModeToggle() {
     return;
   }
 
-  // Function to set the colors for light or dark mode
+  // Function to apply dark or light mode
   function setColors(colorObject, animate) {
     if (typeof gsap !== "undefined" && animate) {
       gsap.to(htmlElement, {
@@ -74,13 +72,15 @@ function colorModeToggle() {
       localStorage.setItem("dark-mode", "true");
       htmlElement.classList.add("dark-mode");
       setColors(darkColors, animate);
-      togglePressed = "true";
+      togglePressed = "true";  // Set aria-pressed to true for dark mode
     } else {
       localStorage.setItem("dark-mode", "false");
       htmlElement.classList.remove("dark-mode");
       setColors(lightColors, animate);
-      togglePressed = "false";
+      togglePressed = "false";  // Set aria-pressed to false for light mode
     }
+
+    // Update aria-pressed attribute for each toggle button
     if (typeof toggleEl !== "undefined") {
       toggleEl.forEach(function (element) {
         element.setAttribute("aria-pressed", togglePressed);
@@ -88,27 +88,27 @@ function colorModeToggle() {
     }
   }
 
-  // First, check the user's stored preference in localStorage
+  // Check user's saved preference from localStorage
   let storagePreference = localStorage.getItem("dark-mode");
 
-  // Apply dark mode by default if no stored preference
+  // Default to dark mode if no preference is found
   if (storagePreference === null) {
-    goDark(true, false); // Dark mode by default
+    goDark(true, false);  // Force dark mode by default
   } else {
-    // Apply the stored preference
+    // Apply the user's stored preference
     storagePreference === "true" ? goDark(true, false) : goDark(false, false);
   }
 
-  // Event listener for the toggle button
+  // Add event listener to toggle button
   window.addEventListener("DOMContentLoaded", (event) => {
     toggleEl = document.querySelectorAll("[tr-color-toggle]");
     toggleEl.forEach(function (element) {
-      element.setAttribute("aria-label", "View Dark Mode");
+      element.setAttribute("aria-label", "Toggle Dark/Light Mode");
       element.setAttribute("role", "button");
       element.setAttribute("aria-pressed", togglePressed);
     });
 
-    // Toggle dark/light mode on button click
+    // Toggle between dark and light modes on button click
     toggleEl.forEach(function (element) {
       element.addEventListener("click", function () {
         let darkClass = htmlElement.classList.contains("dark-mode");
@@ -117,4 +117,5 @@ function colorModeToggle() {
     });
   });
 }
+
 colorModeToggle();
