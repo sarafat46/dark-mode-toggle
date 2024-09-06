@@ -123,8 +123,16 @@ colorModeToggle();
 document.addEventListener("DOMContentLoaded", function () {
     const htmlElement = document.documentElement;
     const titleElement = document.getElementById("item-title");  // Target the title element by ID
+    let toggleEl;
 
-    // Function to change the title color based on dark/light mode
+    // Existing function to apply dark or light mode (with animations if needed)
+    function setColors(colorObject, animate) {
+        Object.keys(colorObject).forEach(function (key) {
+            htmlElement.style.setProperty(key, colorObject[key]);
+        });
+    }
+
+    // Updated function to change the title color when switching modes
     function setTitleColor(isDarkMode) {
         if (titleElement) {
             if (isDarkMode) {
@@ -136,15 +144,24 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // Function to toggle between dark and light mode
-    function goDark(dark) {
+    function goDark(dark, animate) {
         if (dark) {
             localStorage.setItem("dark-mode", "true");
             htmlElement.classList.add("dark-mode");
-            setTitleColor(true);  // Apply dark mode color
+            setColors(darkColors, animate);  // Apply dark mode colors
+            setTitleColor(true);  // Set the title color to dark mode (white)
         } else {
             localStorage.setItem("dark-mode", "false");
             htmlElement.classList.remove("dark-mode");
-            setTitleColor(false);  // Apply light mode color
+            setColors(lightColors, animate);  // Apply light mode colors
+            setTitleColor(false);  // Set the title color to light mode (black)
+        }
+
+        // Update aria-pressed attribute for toggle buttons (if applicable)
+        if (toggleEl) {
+            toggleEl.forEach(function (element) {
+                element.setAttribute("aria-pressed", dark ? "true" : "false");
+            });
         }
     }
 
@@ -153,17 +170,24 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Default to dark mode if no preference is found
     if (darkModePreference === null) {
-        goDark(true);  // Default to dark mode
+        goDark(true, false);  // Default to dark mode
     } else {
         // Apply the saved preference
-        goDark(darkModePreference === "true");
+        goDark(darkModePreference === "true", false);
     }
 
-    // Add event listener for the toggle button
-    const toggleButton = document.querySelector("[tr-color-toggle]");
-    toggleButton?.addEventListener("click", function () {
-        const isDarkMode = htmlElement.classList.contains("dark-mode");
-        goDark(!isDarkMode);  // Toggle between modes
+    // Add event listener for the toggle button to switch modes
+    window.addEventListener("DOMContentLoaded", (event) => {
+        toggleEl = document.querySelectorAll("[tr-color-toggle]");
+        toggleEl.forEach(function (element) {
+            element.setAttribute("aria-label", "Toggle Dark/Light Mode");
+            element.setAttribute("role", "button");
+
+            // Toggle between dark and light modes on button click
+            element.addEventListener("click", function () {
+                const isDarkMode = htmlElement.classList.contains("dark-mode");
+                goDark(!isDarkMode, true);  // Toggle modes and apply the corresponding colors
+            });
+        });
     });
 });
-
