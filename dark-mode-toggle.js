@@ -130,9 +130,13 @@ document.addEventListener("DOMContentLoaded", function () {
         if (titleElement) {
             if (isDarkMode) {
                 titleElement.style.color = "#FFFFFF";  // White for dark mode
+                console.log("Dark mode - Title color changed to white");
             } else {
                 titleElement.style.color = "#000000";  // Black for light mode
+                console.log("Light mode - Title color changed to black");
             }
+        } else {
+            console.warn("Title element not found!");
         }
     }
 
@@ -140,6 +144,7 @@ document.addEventListener("DOMContentLoaded", function () {
     function enforceTitleColor() {
         const isDarkMode = htmlElement.classList.contains("dark-mode");
         setTitleColor(isDarkMode);  // Set the correct title color based on the current mode
+        console.log("Checking and enforcing title color...");  // Log every time the check is made
     }
 
     // Run the title color enforcement every 500 milliseconds (adjust as needed)
@@ -152,11 +157,13 @@ document.addEventListener("DOMContentLoaded", function () {
             htmlElement.classList.add("dark-mode");
             setColors(darkColors, animate);  // Apply dark mode colors
             setTitleColor(true);  // Apply dark mode color to the title
+            console.log("Switched to dark mode");
         } else {
             localStorage.setItem("dark-mode", "false");
             htmlElement.classList.remove("dark-mode");
             setColors(lightColors, animate);  // Apply light mode colors
             setTitleColor(false);  // Apply light mode color to the title
+            console.log("Switched to light mode");
         }
 
         if (toggleEl) {
@@ -190,3 +197,4 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 });
+
